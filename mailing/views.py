@@ -19,3 +19,7 @@ class MailingViewSet(viewsets.ModelViewSet):
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MsgSerializer
+
+    def list(self, request, *args, **kwargs):
+        self.queryset = Message.objects.filter(mailing_id=kwargs["mailing_pk"])
+        return super().list(request, *args, **kwargs)
