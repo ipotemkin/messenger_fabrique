@@ -1,8 +1,14 @@
 from django.db import models
 
+from mailing.validators import PhoneNumberValidator
+
 
 class Client(models.Model):
-    phone = models.CharField(max_length=11, verbose_name="Номер телефона")
+    phone = models.CharField(
+        max_length=11,
+        validators=[PhoneNumberValidator],
+        verbose_name="Номер телефона"
+    )
     operator_id = models.CharField(max_length=20, verbose_name="Код мобильного оператора")
     tag = models.CharField(max_length=20, verbose_name="Тэг")
     timezone = models.CharField(max_length=10, verbose_name="Часовой пояс")
