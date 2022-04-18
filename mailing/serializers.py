@@ -5,21 +5,8 @@ from mailing.models import Client, Mailing, Message
 
 
 class ClientSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Client
-        # exclude = ("id",)
-        fields = "__all__"
-
-
-class MsgSimpleSerializer(serializers.ModelSerializer):
-    # client = ClientSerializer()
-    # mailing = MailingSerializer()
-
-    class Meta:
-        model = Message
-        # exclude = ("id",)
-        # fields = ("status",)
         fields = "__all__"
 
 
@@ -29,8 +16,19 @@ class MailingSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class MsgSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = "__all__"
+
+
+class MsgRetrieveSerializer(MsgSerializer):
+    client = ClientSerializer()
+    mailing = MailingSerializer()
+
+
 class MailingRetrieveSerializer(MailingSerializer):
-    messages = MsgSimpleSerializer(many=True)
+    messages = MsgSerializer(many=True)
 
 
 class MailingListSerializer(MailingSerializer):
@@ -44,14 +42,3 @@ class MailingListSerializer(MailingSerializer):
             .annotate(counts=Count('status'))
         )
         return [{status['status']: status['counts']} for status in statuses]
-
-
-class MsgSerializer(serializers.ModelSerializer):
-    client = ClientSerializer()
-    mailing = MailingSerializer()
-
-    class Meta:
-        model = Message
-        # exclude = ("id",)
-        # fields = ("status",)
-        fields = "__all__"

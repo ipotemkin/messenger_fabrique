@@ -8,7 +8,7 @@ from mailing.serializers import (
     ClientSerializer,
     MailingSerializer,
     MsgSerializer,
-    MsgSimpleSerializer,
+    MsgRetrieveSerializer,
     MailingListSerializer,
     MailingRetrieveSerializer
 )
@@ -36,16 +36,15 @@ class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MsgSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        self.serializer_class = MsgRetrieveSerializer
+        return super().retrieve(request, *args, **kwargs)
+
+
+class MessageForMailingView(ListAPIView):
+    queryset = Message.objects.all()
+    serializer_class = MsgSerializer
+
     def list(self, request, *args, **kwargs):
-        if "mailing_pk" in kwargs:
-            self.queryset = Message.objects.filter(mailing_id=kwargs["mailing_pk"])
-            self.serializer_class = MsgSimpleSerializer
+        self.queryset = Message.objects.filter(mailing_id=kwargs["mailing_pk"])
         return super().list(request, *args, **kwargs)
-
-
-class MailingsStatsView(ListAPIView):
-    queryset = Mailing.objects.all()
-    serializer_class = MailingListSerializer
-
-    def get(self, request, *args, **kwargs):
-        return Response({'stub': 'stub'})
