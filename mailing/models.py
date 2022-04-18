@@ -34,7 +34,12 @@ class Mailing(models.Model):
 class Message(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата и время создания (отправки)")
     status = models.CharField(max_length=10, verbose_name="Статус отправки")
-    mailing = models.ForeignKey(Mailing, on_delete=models.CASCADE, verbose_name="ID рассылки")
+    mailing = models.ForeignKey(
+        Mailing,
+        on_delete=models.CASCADE,
+        related_name="messages",
+        verbose_name="ID рассылки"
+    )
     client = models.ForeignKey(Client, on_delete=models.CASCADE, verbose_name="ID клиента")
 
     class Meta:
@@ -43,4 +48,4 @@ class Message(models.Model):
         ordering = ["-created_at"]
 
     def __str__(self):
-        return f"pk={self.pk}, created_at={self.created_at}, client_id={self.client}, sendout_id={self.mailing}"
+        return f"pk={self.pk}, created_at={self.created_at}, client_id={self.client}, mailing_id={self.mailing}"
