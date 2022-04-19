@@ -1,22 +1,10 @@
 import json
 from datetime import datetime
 from typing import List
-import asyncio
 import requests
 
 from mailing.models import Mailing, Client, Message
 from messenger.settings import API_URL, PROBE_TOKEN
-import aiohttp
-
-
-async def async_post_message(msg_id: int, msg: dict):
-    url = f"{API_URL}/v1/send/{msg_id}"
-    print(url)
-    headers = {'Authorization': 'Bearer ' + PROBE_TOKEN}
-    async with aiohttp.ClientSession() as session:
-        async with session.post(url, json=msg, headers=headers) as resp:
-            response = await resp.json()
-            return response.ok
 
 
 def post_message(msg_id: int, msg: dict):
