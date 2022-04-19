@@ -1,30 +1,10 @@
-import json
-from datetime import datetime
 from typing import List
-import requests
+
+from celery import shared_task
+from datetime import datetime
 
 from mailing.models import Mailing, Client, Message
-from messenger.settings import API_URL, PROBE_TOKEN
-
-
-def post_message(msg_id: int, msg: dict) -> bool:
-    url = f"{API_URL}/v1/send/{msg_id}"
-    print(url)
-    headers = {
-        'accept': 'application/json',
-        'Authorization': 'Bearer ' + PROBE_TOKEN,
-        'Content-Type': 'application/json'
-    }
-    response = requests.post(url, data=json.dumps(msg), headers=headers)
-    print("for msg = ", msg)
-    # print(response)
-    # print(response.json())
-    # print(response.__dict__)
-    return response.ok
-
-    # print('in do_mailing')
-    # print(operator_id)
-    # print(tag)
+from mailing.probe_api import post_message
 
 
 def do_mailing(mailing: Mailing) -> None:
@@ -46,7 +26,23 @@ def pick_up_clients_for_mailing(operator_id: str, tag: str) -> List[Client]:
     return clients
 
 
-# TODO to make return status
+def schedule_all_mailings():
+    mailings = Mailing.objects.all()
+    for mailing in mailings:
+        launch_or_schedule_mailing(mailing)
+
+
+def launch_or_schedule_mailing(mailing: Mailing):
+    launch_at = mailing.launch_at
+    terminate_at = mailing.terminate_at
+    current_time = datetime.now(launch_at.tzinfo)
+
+    if launch_at < current_time < terminate_at:
+        do_mailing(mailing)
+    elif current_time < launch_at and current_time < terminate_at:
+        send_out_messages_for_mailing.apply_async((mailing.pk,), eta=launch_at)
+
+
 def execute_mailing(mailing: Mailing, clients: List[Client]) -> None:
 
     print(clients)
@@ -80,3 +76,15 @@ def create_message(mailing: Mailing, client_id: int) -> Message:
     msg = Message(mailing_id=mailing.pk, client_id=client_id, status='Awaited')
     msg.save()
     return msg
+
+
+@shared_task
+def send_out_messages_for_mailing(mailing_id: int):
+    mailing = Mailing.objects.get(pk=mailing_id)
+    do_mailing(mailing)
+
+
+@shared_task
+def set_tasks_on_startup():
+    print("Начальная установка тасков")
+    schedule_all_mailings()

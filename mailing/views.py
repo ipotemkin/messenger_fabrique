@@ -1,7 +1,5 @@
-from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
-from rest_framework.response import Response
 
 from mailing.models import Client, Mailing, Message
 from mailing.serializers import (
@@ -12,7 +10,7 @@ from mailing.serializers import (
     MailingListSerializer,
     MailingRetrieveSerializer
 )
-from mailing.service import pick_up_clients_for_mailing, do_mailing
+from mailing.tasks import launch_or_schedule_mailing
 
 
 class ClientViewSet(viewsets.ModelViewSet):
@@ -20,7 +18,8 @@ class ClientViewSet(viewsets.ModelViewSet):
     serializer_class = ClientSerializer
 
     def list(self, request, *args, **kwargs):
-        pick_up_clients_for_mailing(operator_id='Beeline', tag='market')  # TODO remove
+        # pick_up_clients_for_mailing(operator_id='Beeline', tag='market')  # TODO remove
+        # send_out_messages_for_mailing.delay() # TODO remove
         return super().list(request, *args, **kwargs)
 
 
@@ -34,8 +33,19 @@ class MailingViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         self.serializer_class = MailingRetrieveSerializer
-        do_mailing(self.get_queryset().get(pk=kwargs['pk']))  # TODO remove
+        # do_mailing(self.get_queryset().get(pk=kwargs['pk']))  # TODO remove
         return super().retrieve(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        new_mailing_response = super().create(request, *args, **kwargs)
+        print(new_mailing_response.data["id"])
+
+        new_mailing = Mailing.objects.get(pk=new_mailing_response.data["id"])
+
+        # to execute or schedule the created mailing
+        launch_or_schedule_mailing(new_mailing)
+
+        return new_mailing_response
 
 
 class MessageViewSet(viewsets.ModelViewSet):

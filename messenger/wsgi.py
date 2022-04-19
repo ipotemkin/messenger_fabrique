@@ -11,6 +11,10 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
+from mailing.tasks import set_tasks_on_startup
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'messenger.settings')
 
 application = get_wsgi_application()
+
+set_tasks_on_startup.apply_async(countdown=10)

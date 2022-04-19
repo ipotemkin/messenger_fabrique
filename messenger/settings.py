@@ -171,3 +171,5 @@ SWAGGER_SETTINGS = {
 }
 
 API_URL = "https://probe.fbrq.cloud"
+
+CELERY_BROKER_URL = 'pyamqp://guest@localhost//'
