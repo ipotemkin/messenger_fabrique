@@ -7,7 +7,7 @@ from mailing.models import Mailing, Client, Message
 from messenger.settings import API_URL, PROBE_TOKEN
 
 
-def post_message(msg_id: int, msg: dict):
+def post_message(msg_id: int, msg: dict) -> bool:
     url = f"{API_URL}/v1/send/{msg_id}"
     print(url)
     headers = {
@@ -27,7 +27,7 @@ def post_message(msg_id: int, msg: dict):
     # print(tag)
 
 
-def do_mailing(mailing: Mailing):
+def do_mailing(mailing: Mailing) -> None:
     operator_id, tag = get_clients_filter(mailing)
     clients = pick_up_clients_for_mailing(operator_id, tag)
     execute_mailing(mailing, clients)
@@ -46,7 +46,8 @@ def pick_up_clients_for_mailing(operator_id: str, tag: str) -> List[Client]:
     return clients
 
 
-def execute_mailing(mailing: Mailing, clients: List[Client]):
+# TODO to make return status
+def execute_mailing(mailing: Mailing, clients: List[Client]) -> None:
 
     print(clients)
 
@@ -61,7 +62,14 @@ def execute_mailing(mailing: Mailing, clients: List[Client]):
             print('Making a mailing')
 
             msg = create_message(mailing, client.pk)
-            status_ok = post_message(msg.pk, {'id': msg.pk, 'phone': int(client.phone), 'text': mailing.text})
+            status_ok = post_message(
+                msg.pk,
+                {
+                    'id': msg.pk,
+                    'phone': int(client.phone),
+                    'text': mailing.text
+                }
+            )
             msg.status = 'Success' if status_ok else 'Fail'
             msg.save()
 
