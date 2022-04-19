@@ -1,1 +1,83 @@
-# test
+version: "3.9"
+
+services:
+
+  api:
+    build:
+      context: .
+    volumes:
+      - .:/code
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USER: ${DB_USER}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: postgres
+      SECRET_KEY: ${SECRET_KEY}
+      CELERY_BROKER_URL: 'pyamqp://guest@rabbitmq//'
+    ports:
+      - '8000:8000'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+      rabbitmq:
+        condition: service_healthy
+    command: >
+      sh -c "python3 manage.py makemigrations &&
+            python3 manage.py runserver 0.0.0.0:8000"
+
+  celery:
+    build:
+      context: .
+    volumes:
+      - .:/code
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USER: ${DB_USER}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: postgres
+      SECRET_KEY: ${SECRET_KEY}
+      CELERY_BROKER_URL: 'pyamqp://guest@rabbitmq//'
+    command: celery -A messenger worker -l info
+
+  migrations:
+    build:
+      context: .
+    volumes:
+      - .:/code
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_USER: ${DB_USER}
+      DB_NAME: ${DB_NAME}
+      DB_HOST: postgres
+      SECRET_KEY: ${SECRET_KEY}
+      CELERY_BROKER_URL: 'pyamqp://guest@rabbitmq//'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: python manage.py migrate
+
+  postgres:
+    image: postgres:12.4-alpine
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:latest
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 30s
+      timeout: 30s
+      retries: 3
+
+volumes:
+  postgres-data:
