@@ -41,4 +41,10 @@ class MailingListSerializer(MailingSerializer):
             .values('status')
             .annotate(counts=Count('status'))
         )
-        return [{status['status']: status['counts']} for status in statuses]
+        result_d = {}
+        for status in statuses:
+            result_d[status['status']] = status['counts']
+
+        return result_d
+
+        # return [{status['status']: status['counts']} for status in statuses]

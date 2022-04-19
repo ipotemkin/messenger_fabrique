@@ -33,6 +33,10 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
+PROBE_TOKEN = env("PROBE_TOKEN")
+
+
 ALLOWED_HOSTS = []
 
 
@@ -165,3 +169,5 @@ SWAGGER_SETTINGS = {
         "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}
     }
 }
+
+API_URL = "https://probe.fbrq.cloud"

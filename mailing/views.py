@@ -12,11 +12,16 @@ from mailing.serializers import (
     MailingListSerializer,
     MailingRetrieveSerializer
 )
+from mailing.service import pick_up_clients_for_mailing, do_mailing
 
 
 class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
+
+    def list(self, request, *args, **kwargs):
+        pick_up_clients_for_mailing(operator_id='Beeline', tag='market')  # TODO remove
+        return super().list(request, *args, **kwargs)
 
 
 class MailingViewSet(viewsets.ModelViewSet):
@@ -29,6 +34,7 @@ class MailingViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         self.serializer_class = MailingRetrieveSerializer
+        do_mailing(self.get_queryset().get(pk=kwargs['pk']))  # TODO remove
         return super().retrieve(request, *args, **kwargs)
 
 
