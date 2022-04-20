@@ -39,14 +39,13 @@
 ## Зависимости
 1. Django==4.0.4
 2. PostgreSQL
-3. Celery
+3. celery==5.2.6
 4. RabbitMQ
 5. django-environ==0.8.1
 6. djangorestframework==3.13.1
 7. djangorestframework-simplejwt==5.1.0
 8. drf-spectacular==0.22.0
 9. psycopg2==2.9.3
-10. python-dotenv==0.20.0
 11. requests==2.27.1
 12. djoser==2.1.0
 13. django-phonenumbers==1.0.1
