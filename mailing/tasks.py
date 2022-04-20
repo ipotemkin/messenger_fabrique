@@ -48,7 +48,7 @@ def get_clients_by_filter(mailing_filter: str) -> List[Client]:
     return clients
 
 
-def schedule_all_mailings():
+def schedule_all_mailings() -> None:
     """Поставить в расписание все рассылки в базе"""
 
     mailings = Mailing.objects.all()
@@ -56,7 +56,7 @@ def schedule_all_mailings():
         launch_or_schedule_mailing(mailing)
 
 
-def launch_or_schedule_mailing(mailing: Mailing):
+def launch_or_schedule_mailing(mailing: Mailing) -> None:
     """Запустить рассылку или поставить ее в расписание. Работает только в отношении актуальных рассылок"""
 
     launch_at = mailing.launch_at
