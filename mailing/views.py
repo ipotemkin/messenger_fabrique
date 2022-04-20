@@ -38,7 +38,18 @@ class ClientViewSet(viewsets.ModelViewSet):
 @extend_schema_view(
     list=extend_schema(description="Получить список рассылок", summary="Список рассылок"),
     retrieve=extend_schema(description="Получить рассылку по ID", summary="Рассылка по ID"),
-    create=extend_schema(description="Добавить рассылку", summary="Добавить рассылку"),
+    create=extend_schema(
+        description="""
+Добавить рассылку
+
+Формат фильтра для выбора клиентов для рассылки: **'код оператора 2','код оператора 2'|тэг1,тэг2**
+
+Сначала указываются **коды оператора**, затем символ **|**, затем **тэги**.
+
+Параметры разделяются запятыми 
+        """,
+        summary="Добавить рассылку"
+    ),
     update=extend_schema(description="Обновить рассылку", summary="Обновить рассылку"),
     partial_update=extend_schema(
         description="Обновить рассылку (частично)",
