@@ -11,6 +11,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_HOST: postgres
       SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG}
       CELERY_BROKER_URL: 'pyamqp://guest@rabbitmq//'
     ports:
       - '8000:8000'
@@ -32,6 +33,7 @@ services:
       DB_NAME: ${DB_NAME}
       DB_HOST: postgres
       SECRET_KEY: ${SECRET_KEY}
+      DEBUG: ${DEBUG}
       CELERY_BROKER_URL: 'pyamqp://guest@rabbitmq//'
     command: celery -A messenger worker -l info
 
