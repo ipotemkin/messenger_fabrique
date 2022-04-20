@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from messenger.settings import UserRoles
+from users.managers import UserRoles
 
 
 class IsAdmin(permissions.BasePermission):

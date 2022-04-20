@@ -2,7 +2,10 @@ from django.contrib.auth.models import (
     BaseUserManager
 )
 
-from messenger.settings import UserRoles
+
+class UserRoles:
+    USER = "user"
+    ADMIN = "admin"
 
 
 class UserManager(BaseUserManager):

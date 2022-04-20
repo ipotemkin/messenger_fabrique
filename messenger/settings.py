@@ -165,8 +165,3 @@ DJOSER = {
 }
 
 AUTH_USER_MODEL = 'users.User'
-
-
-class UserRoles:
-    USER = "user"
-    ADMIN = "admin"
