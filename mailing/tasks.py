@@ -3,26 +3,44 @@ from typing import List
 from celery import shared_task
 from datetime import datetime
 
+from django.db.models import Q
+
 from mailing.models import Mailing, Client, Message
 from mailing.probe_api import post_message
 
 
 def do_mailing(mailing: Mailing) -> None:
-    operator_id, tag = get_clients_filter(mailing)
-    clients = pick_up_clients_for_mailing(operator_id, tag)
+    clients = pick_up_clients_for_mailing(mailing)
     execute_mailing(mailing, clients)
 
 
-def get_clients_filter(mailing: Mailing) -> tuple[str, str]:
-    operator_id, tag = mailing.mailing_filter.split('|')
-    operator_id = operator_id.strip()
-    tag = tag.strip()
-    return operator_id, tag
+def pick_up_clients_for_mailing(mailing: Mailing) -> List[Client]:
+    filter_lst = mailing.mailing_filter.strip().split('|')
+    filter_len = len(filter_lst)
 
+    query = Q()
 
-def pick_up_clients_for_mailing(operator_id: str, tag: str) -> List[Client]:
-    clients = Client.objects.filter(operator_id__iexact=operator_id).filter(tag__iexact=tag)
-    print(clients)
+    # if no filter
+    if filter_len < 1:
+        return query
+
+    query_operator = Q()
+    query_tag = Q()
+
+    # if any tag in the filter
+    if filter_len > 1 and (tags_str := filter_lst[1]):
+        tags = [tag.strip() for tag in tags_str.split(',')]
+        for tag in tags:
+            query_tag |= Q(tag__iexact=tag)
+
+    # if any operator_id in the filter
+    if operator_ids_str := filter_lst[0]:
+        operator_ids = [operator_id.strip() for operator_id in operator_ids_str.split(',')]
+        for operator_id in operator_ids:
+            query_operator |= Q(operator_id__iexact=operator_id)
+
+    query = query_operator & query_tag
+    clients = Client.objects.filter(query)
     return clients
 
 
