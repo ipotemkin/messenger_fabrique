@@ -1,8 +1,10 @@
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
 
 from mailing.models import Client, Mailing, Message
+from mailing.permissions import IsAdmin
 from mailing.serializers import (
     ClientSerializer,
     MailingSerializer,
@@ -29,10 +31,20 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
 
-    def list(self, request, *args, **kwargs):
-        # pick_up_clients_for_mailing(operator_id='Beeline', tag='market')  # TODO remove
-        # send_out_messages_for_mailing.delay() # TODO remove
-        return super().list(request, *args, **kwargs)
+    # def list(self, request, *args, **kwargs):
+    #     # pick_up_clients_for_mailing(operator_id='Beeline', tag='market')  # TODO remove
+    #     # send_out_messages_for_mailing.delay() # TODO remove
+    #     return super().list(request, *args, **kwargs)
+
+    def get_permissions(self):
+        """sets permissions for clients' views"""
+
+        permissions = []
+        if self.action in ("list", "retrieve"):
+            permissions = (IsAuthenticated,)
+        elif self.action in ("create", "update", "partial_update", "destroy"):
+            permissions = (IsAuthenticated & IsAdmin,)
+        return [permission() for permission in permissions]
 
 
 @extend_schema_view(
@@ -81,6 +93,16 @@ class MailingViewSet(viewsets.ModelViewSet):
 
         return new_mailing_response
 
+    def get_permissions(self):
+        """sets permissions for mailings' views"""
+
+        permissions = []
+        if self.action in ("list", "retrieve"):
+            permissions = (IsAuthenticated,)
+        elif self.action in ("create", "update", "partial_update", "destroy"):
+            permissions = (IsAuthenticated & IsAdmin,)
+        return [permission() for permission in permissions]
+
 
 @extend_schema_view(
     list=extend_schema(description="Получить список сообщений", summary="Список сообщений"),
@@ -101,6 +123,16 @@ class MessageViewSet(viewsets.ModelViewSet):
         self.serializer_class = MsgRetrieveSerializer
         return super().retrieve(request, *args, **kwargs)
 
+    def get_permissions(self):
+        """sets permissions for messages' views"""
+
+        permissions = []
+        if self.action in ("list", "retrieve"):
+            permissions = (IsAuthenticated,)
+        elif self.action in ("create", "update", "partial_update", "destroy"):
+            permissions = (IsAuthenticated & IsAdmin,)
+        return [permission() for permission in permissions]
+
 
 @extend_schema(
     description="Получить список сообщений для заданной рассылки",
@@ -113,3 +145,9 @@ class MessageForMailingView(ListAPIView):
     def list(self, request, *args, **kwargs):
         self.queryset = Message.objects.filter(mailing_id=kwargs["mailing_pk"])
         return super().list(request, *args, **kwargs)
+
+    def get_permissions(self):
+        """sets permissions for messages' by mailing ID views"""
+
+        permissions = (IsAuthenticated,)
+        return [permission() for permission in permissions]
