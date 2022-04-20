@@ -183,3 +183,9 @@ AUTH_USER_MODEL = 'users.User'
 class UserRoles:
     USER = "user"
     ADMIN = "admin"
+
+# SWAGGER_SETTINGS = {
+#     "SECURITY_DEFINITIONS": {
+#         "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}
+#     }
+# }
