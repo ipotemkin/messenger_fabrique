@@ -5,8 +5,8 @@ services:
   api:
     build:
       context: .
-    volumes:
-      - .:/code
+#    volumes:
+#      - .:/code
     environment:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_USER: ${DB_USER}
@@ -23,15 +23,15 @@ services:
         condition: service_completed_successfully
       rabbitmq:
         condition: service_healthy
-    command: >
-      sh -c "python3 manage.py makemigrations &&
-            python3 manage.py runserver 0.0.0.0:8000"
+    command: python3 manage.py runserver 0.0.0.0:8000
+#      sh -c "python3 manage.py makemigrations &&
+#            python3 manage.py runserver 0.0.0.0:8000"
 
   celery:
     build:
       context: .
-    volumes:
-      - .:/code
+#    volumes:
+#      - .:/code
     environment:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_USER: ${DB_USER}
@@ -44,8 +44,8 @@ services:
   migrations:
     build:
       context: .
-    volumes:
-      - .:/code
+#    volumes:
+#      - .:/code
     environment:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_USER: ${DB_USER}
@@ -56,7 +56,9 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    command: python manage.py migrate
+    command: >
+      sh -c "python3 manage.py makemigrations users &&
+            python3 manage.py migrate"
 
   postgres:
     image: postgres:12.4-alpine

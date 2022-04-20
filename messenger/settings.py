@@ -172,9 +172,9 @@ API_URL = "https://probe.fbrq.cloud"
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 
 DJOSER = {
-    'SERIALIZERS': {
-        'user_create': 'users.serializers.UserRegistrationSerializer'
-    },
+    # 'SERIALIZERS': {
+    #     'user_create': 'users.serializers.UserRegistrationSerializer'
+    # },
     'LOGIN_FIELD': 'email'
 }
 

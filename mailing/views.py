@@ -31,18 +31,13 @@ class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
 
-    # def list(self, request, *args, **kwargs):
-    #     # pick_up_clients_for_mailing(operator_id='Beeline', tag='market')  # TODO remove
-    #     # send_out_messages_for_mailing.delay() # TODO remove
-    #     return super().list(request, *args, **kwargs)
-
     def get_permissions(self):
         """sets permissions for clients' views"""
 
         permissions = []
-        if self.action in ("list", "retrieve"):
+        if self.action in ("create", "list", "retrieve"):
             permissions = (IsAuthenticated,)
-        elif self.action in ("create", "update", "partial_update", "destroy"):
+        elif self.action in ("update", "partial_update", "destroy"):
             permissions = (IsAuthenticated & IsAdmin,)
         return [permission() for permission in permissions]
 
@@ -97,9 +92,9 @@ class MailingViewSet(viewsets.ModelViewSet):
         """sets permissions for mailings' views"""
 
         permissions = []
-        if self.action in ("list", "retrieve"):
+        if self.action in ("create", "list", "retrieve"):
             permissions = (IsAuthenticated,)
-        elif self.action in ("create", "update", "partial_update", "destroy"):
+        elif self.action in ("update", "partial_update", "destroy"):
             permissions = (IsAuthenticated & IsAdmin,)
         return [permission() for permission in permissions]
 

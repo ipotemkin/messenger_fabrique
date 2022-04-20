@@ -26,14 +26,14 @@ class UserManager(BaseUserManager):
 
         return user
 
-    def create_user(self, email, first_name, last_name, phone, password=None):
+    def create_user(self, email, first_name=None, last_name=None, phone=None, password=None):
         """
-        функция создания **обычного** пользователя — в нее мы передаем обязательные поля
+        функция создания **обычного** пользователя
         """
 
         return self._create_base_user(email, first_name, last_name, phone, password, role=UserRoles.USER)
 
-    def create_superuser(self, email, first_name, last_name, phone, password=None):
+    def create_superuser(self, email, first_name=None, last_name=None, phone=None, password=None):
         """
         функция для создания **суперпользователя** — с ее помощью мы создаем админинстратора
         это можно сделать с помощью команды createsuperuser
