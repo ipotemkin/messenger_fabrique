@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "rest_framework",
     'rest_framework_simplejwt',
+    "djoser",
+    "users",
     'mailing',
 ]
 
@@ -168,3 +170,16 @@ SPECTACULAR_SETTINGS = {
 API_URL = "https://probe.fbrq.cloud"
 
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+
+DJOSER = {
+    'SERIALIZERS': {
+        'user_create': 'users.serializers.UserRegistrationSerializer'
+    },
+    'LOGIN_FIELD': 'email'
+}
+
+AUTH_USER_MODEL = 'users.User'
+
+class UserRoles:
+    USER = "user"
+    ADMIN = "admin"
