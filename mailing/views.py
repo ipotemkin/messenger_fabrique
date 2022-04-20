@@ -1,10 +1,9 @@
 from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from mailing.models import Client, Mailing, Message
-from mailing.permissions import IsAdmin
 from mailing.serializers import (
     ClientSerializer,
     MailingSerializer,
@@ -38,7 +37,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "list", "retrieve"):
             permissions = (IsAuthenticated,)
         elif self.action in ("update", "partial_update", "destroy"):
-            permissions = (IsAuthenticated & IsAdmin,)
+            permissions = (IsAuthenticated & IsAdminUser,)
         return [permission() for permission in permissions]
 
 
@@ -91,7 +90,7 @@ class MailingViewSet(viewsets.ModelViewSet):
         if self.action in ("create", "list", "retrieve"):
             permissions = (IsAuthenticated,)
         elif self.action in ("update", "partial_update", "destroy"):
-            permissions = (IsAuthenticated & IsAdmin,)
+            permissions = (IsAuthenticated & IsAdminUser,)
         return [permission() for permission in permissions]
 
 
@@ -121,7 +120,7 @@ class MessageViewSet(viewsets.ModelViewSet):
         if self.action in ("list", "retrieve"):
             permissions = (IsAuthenticated,)
         elif self.action in ("create", "update", "partial_update", "destroy"):
-            permissions = (IsAuthenticated & IsAdmin,)
+            permissions = (IsAuthenticated & IsAdminUser,)
         return [permission() for permission in permissions]
 
 
