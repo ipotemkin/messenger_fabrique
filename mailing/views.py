@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_view, extend_schema
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
 
@@ -13,6 +14,17 @@ from mailing.serializers import (
 from mailing.tasks import launch_or_schedule_mailing
 
 
+@extend_schema_view(
+    list=extend_schema(description="Получить список клиентов", summary="Список клиентов"),
+    retrieve=extend_schema(description="Получить клиента по ID", summary="Клиент по ID"),
+    create=extend_schema(description="Добавить клиента", summary="Добавить клиента"),
+    update=extend_schema(description="Обновить запись о клиенте", summary="Обновить запись о клиенте"),
+    partial_update=extend_schema(
+        description="Обновить запись о клиенте (частично)",
+        summary="Обновить запись о клиенте (частично)"
+    ),
+    destroy=extend_schema(description="Удалить запись клиента", summary="Удалить запись клиента"),
+)
 class ClientViewSet(viewsets.ModelViewSet):
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
@@ -23,6 +35,17 @@ class ClientViewSet(viewsets.ModelViewSet):
         return super().list(request, *args, **kwargs)
 
 
+@extend_schema_view(
+    list=extend_schema(description="Получить список рассылок", summary="Список рассылок"),
+    retrieve=extend_schema(description="Получить рассылку по ID", summary="Рассылка по ID"),
+    create=extend_schema(description="Добавить рассылку", summary="Добавить рассылку"),
+    update=extend_schema(description="Обновить рассылку", summary="Обновить рассылку"),
+    partial_update=extend_schema(
+        description="Обновить рассылку (частично)",
+        summary="Обновить рассылку (частично)"
+    ),
+    destroy=extend_schema(description="Удалить рассылку", summary="Удалить рассылку"),
+)
 class MailingViewSet(viewsets.ModelViewSet):
     queryset = Mailing.objects.all()
     serializer_class = MailingSerializer
@@ -48,6 +71,17 @@ class MailingViewSet(viewsets.ModelViewSet):
         return new_mailing_response
 
 
+@extend_schema_view(
+    list=extend_schema(description="Получить список сообщений", summary="Список сообщений"),
+    retrieve=extend_schema(description="Получить сообщение по ID", summary="Сообщение по ID"),
+    create=extend_schema(description="Добавить сообщение", summary="Добавить сообщение"),
+    update=extend_schema(description="Обновить сообщение", summary="Обновить сообщение"),
+    partial_update=extend_schema(
+        description="Обновить сообщение (частично)",
+        summary="Обновить сообщение (частично)"
+    ),
+    destroy=extend_schema(description="Удалить сообщение", summary="Удалить сообщение"),
+)
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all()
     serializer_class = MsgSerializer
@@ -57,6 +91,10 @@ class MessageViewSet(viewsets.ModelViewSet):
         return super().retrieve(request, *args, **kwargs)
 
 
+@extend_schema(
+    description="Получить список сообщений для заданной рассылки",
+    summary="Список сообщений для заданной рассылки",
+)
 class MessageForMailingView(ListAPIView):
     queryset = Message.objects.all()
     serializer_class = MsgSerializer

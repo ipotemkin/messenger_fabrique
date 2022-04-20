@@ -162,15 +162,9 @@ SPECTACULAR_SETTINGS = {
             "name": "Igor Potemkin",
             "email": "ipotemkin@rambler.ru",
         },
-}
-
-SWAGGER_SETTINGS = {
-    "SECURITY_DEFINITIONS": {
-        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}
-    }
+    'SERVE_INCLUDE_SCHEMA': False,
 }
 
 API_URL = "https://probe.fbrq.cloud"
 
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
-# 'pyamqp://guest@localhost//'
