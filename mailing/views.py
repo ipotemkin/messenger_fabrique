@@ -74,18 +74,14 @@ class MailingViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         self.serializer_class = MailingRetrieveSerializer
-        # do_mailing(self.get_queryset().get(pk=kwargs['pk']))  # TODO remove
         return super().retrieve(request, *args, **kwargs)
 
     def create(self, request, *args, **kwargs):
         new_mailing_response = super().create(request, *args, **kwargs)
-        print(new_mailing_response.data["id"])
-
         new_mailing = Mailing.objects.get(pk=new_mailing_response.data["id"])
 
         # to execute or schedule the created mailing
         launch_or_schedule_mailing(new_mailing)
-
         return new_mailing_response
 
     def get_permissions(self):

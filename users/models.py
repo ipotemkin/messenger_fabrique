@@ -18,6 +18,10 @@ class User(AbstractBaseUser):
     role = models.CharField(max_length=5, choices=ROLES, default=UserRoles.USER, verbose_name="Роль")
     is_active = models.BooleanField(default=True)
 
+    class Meta:
+        verbose_name_plural = "Пользователи"
+        verbose_name = "Пользователь"
+
     @property
     def is_superuser(self):
         return self.is_admin

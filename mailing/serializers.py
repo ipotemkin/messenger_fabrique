@@ -46,5 +46,3 @@ class MailingListSerializer(MailingSerializer):
             result_d[status['status']] = status['counts']
 
         return result_d
-
-        # return [{status['status']: status['counts']} for status in statuses]

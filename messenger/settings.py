@@ -145,11 +145,8 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    # "PAGE_SIZE": 4,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
@@ -172,9 +169,6 @@ API_URL = "https://probe.fbrq.cloud"
 CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 
 DJOSER = {
-    # 'SERIALIZERS': {
-    #     'user_create': 'users.serializers.UserRegistrationSerializer'
-    # },
     'LOGIN_FIELD': 'email'
 }
 
@@ -184,9 +178,3 @@ AUTH_USER_MODEL = 'users.User'
 class UserRoles:
     USER = "user"
     ADMIN = "admin"
-
-# SWAGGER_SETTINGS = {
-#     "SECURITY_DEFINITIONS": {
-#         "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"}
-#     }
-# }

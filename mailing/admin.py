@@ -4,10 +4,16 @@ from mailing.models import Mailing, Client, Message
 
 class MsgAdmin(admin.ModelAdmin):
     list_display = ('pk', 'created_at', 'status', 'client', 'mailing')
-    # list_display_links = ('name', 'author')
-    # search_fields = ('name', 'author', 'description')
 
 
-admin.site.register(Mailing)
-admin.site.register(Client)
+class MailingAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'text', 'mailing_filter', 'launch_at', 'terminate_at')
+
+
+class ClientAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'phone', 'operator_id', 'tag', 'timezone')
+
+
+admin.site.register(Mailing, MailingAdmin)
+admin.site.register(Client, ClientAdmin)
 admin.site.register(Message, MsgAdmin)

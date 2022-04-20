@@ -132,5 +132,3 @@ dmypy.json
 ./django_static
 
 checkpass.py
-
-postgres-data/

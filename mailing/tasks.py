@@ -10,12 +10,16 @@ from mailing.probe_api import post_message
 
 
 def do_mailing(mailing: Mailing) -> None:
-    clients = pick_up_clients_for_mailing(mailing)
+    """Осуществляет рассылку"""
+
+    clients = get_clients_by_filter(mailing.mailing_filter)
     execute_mailing(mailing, clients)
 
 
-def pick_up_clients_for_mailing(mailing: Mailing) -> List[Client]:
-    filter_lst = mailing.mailing_filter.strip().split('|')
+def get_clients_by_filter(mailing_filter: str) -> List[Client]:
+    """Возвращает список клиентов согласно фильтру в рассылке"""
+
+    filter_lst = mailing_filter.strip().split('|')
     filter_len = len(filter_lst)
 
     query = Q()
@@ -45,12 +49,16 @@ def pick_up_clients_for_mailing(mailing: Mailing) -> List[Client]:
 
 
 def schedule_all_mailings():
+    """Поставить в расписание все рассылки в базе"""
+
     mailings = Mailing.objects.all()
     for mailing in mailings:
         launch_or_schedule_mailing(mailing)
 
 
 def launch_or_schedule_mailing(mailing: Mailing):
+    """Запустить рассылку или поставить ее в расписание. Работает только в отношении актуальных рассылок"""
+
     launch_at = mailing.launch_at
     terminate_at = mailing.terminate_at
     current_time = datetime.now(launch_at.tzinfo)
@@ -62,19 +70,11 @@ def launch_or_schedule_mailing(mailing: Mailing):
 
 
 def execute_mailing(mailing: Mailing, clients: List[Client]) -> None:
-
-    print(clients)
+    """Выполняет рассылку сообщений переданным в аргументах клиентам"""
 
     for client in clients:
         current_time = datetime.now(mailing.terminate_at.tzinfo)
-
-        print('mailing.terminate_at =', mailing.terminate_at, type(mailing.terminate_at))
-        print('now = ', current_time, type(current_time))
-
         if mailing.terminate_at > current_time:
-
-            print('Making a mailing')
-
             msg = create_message(mailing, client.pk)
             status_ok = post_message(
                 msg.pk,
@@ -87,22 +87,25 @@ def execute_mailing(mailing: Mailing, clients: List[Client]) -> None:
             msg.status = 'Success' if status_ok else 'Fail'
             msg.save()
 
-            print(msg)
-
 
 def create_message(mailing: Mailing, client_id: int) -> Message:
+    """Создает сообщение в базе данных"""
+
     msg = Message(mailing_id=mailing.pk, client_id=client_id, status='Awaited')
     msg.save()
     return msg
 
 
 @shared_task
-def send_out_messages_for_mailing(mailing_id: int):
+def send_out_messages_for_mailing(mailing_id: int) -> None:
+    """Запускает конкретную рассылку согласно установленному расписанию"""
+
     mailing = Mailing.objects.get(pk=mailing_id)
     do_mailing(mailing)
 
 
 @shared_task
-def set_tasks_on_startup():
-    print("Начальная установка тасков")
+def set_tasks_on_startup() -> None:
+    """Устанавливает расписание рассылок при старте/рестарте приложения """
+
     schedule_all_mailings()
