@@ -1,18 +1,20 @@
 version: "3.9"
 
+x-common-variables: &common-variables
+  DB_PASSWORD: ${DB_PASSWORD}
+  DB_USER: ${DB_USER}
+  DB_NAME: ${DB_NAME}
+  DB_HOST: postgres
+  SECRET_KEY: ${SECRET_KEY}
+  DEBUG: ${DEBUG}
+  CELERY_BROKER_URL: 'pyamqp://guest@rabbitmq//'
+
 services:
 
   api:
     build:
       context: .
-    environment:
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_USER: ${DB_USER}
-      DB_NAME: ${DB_NAME}
-      DB_HOST: postgres
-      SECRET_KEY: ${SECRET_KEY}
-      DEBUG: ${DEBUG}
-      CELERY_BROKER_URL: 'pyamqp://guest@rabbitmq//'
+    environment: *common-variables
     ports:
       - '8000:8000'
     depends_on:
@@ -27,14 +29,7 @@ services:
   celery:
     build:
       context: .
-    environment:
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_USER: ${DB_USER}
-      DB_NAME: ${DB_NAME}
-      DB_HOST: postgres
-      SECRET_KEY: ${SECRET_KEY}
-      DEBUG: ${DEBUG}
-      CELERY_BROKER_URL: 'pyamqp://guest@rabbitmq//'
+    environment: *common-variables
     command: celery -A messenger worker -l info
 
   postgres:
