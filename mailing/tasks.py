@@ -22,12 +22,6 @@ def get_clients_by_filter(mailing_filter: str) -> List[Client]:
     filter_lst = mailing_filter.strip().split('|')
     filter_len = len(filter_lst)
 
-    query = Q()
-
-    # if no filter
-    if filter_len < 1:
-        return query
-
     query_operator = Q()
     query_tag = Q()
 
@@ -38,7 +32,7 @@ def get_clients_by_filter(mailing_filter: str) -> List[Client]:
             query_tag |= Q(tag__iexact=tag)
 
     # if any operator_id in the filter
-    if operator_ids_str := filter_lst[0]:
+    elif filter_len > 0 and (operator_ids_str := filter_lst[0]):
         operator_ids = [operator_id.strip() for operator_id in operator_ids_str.split(',')]
         for operator_id in operator_ids:
             query_operator |= Q(operator_id__iexact=operator_id)
