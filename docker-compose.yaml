@@ -30,6 +30,9 @@ services:
     build:
       context: .
     environment: *common-variables
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
     command: celery -A messenger worker -l info
 
   postgres:

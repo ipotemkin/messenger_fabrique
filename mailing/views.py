@@ -1,5 +1,5 @@
 from drf_spectacular.utils import extend_schema_view, extend_schema
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
@@ -133,13 +133,8 @@ class MessageViewSet(viewsets.ModelViewSet):
 class MessageForMailingView(ListAPIView):
     queryset = Message.objects.all()
     serializer_class = MsgSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         self.queryset = Message.objects.filter(mailing_id=kwargs["mailing_pk"])
         return super().list(request, *args, **kwargs)
-
-    def get_permissions(self):
-        """sets permissions for messages' by mailing ID views"""
-
-        permissions = (IsAuthenticated,)
-        return [permission() for permission in permissions]
